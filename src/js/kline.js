@@ -1,23 +1,12 @@
-import {
-    Control
-} from './control'
-import {
-    KlineTrade
-} from './kline_trade'
-import {
-    ChartManager
-} from './chart_manager'
-import {
-    ChartSettings
-} from './chart_settings'
-import {
-    Template
-} from './templates'
+import {Control} from './control'
+import {KlineTrade} from './kline_trade'
+import {ChartManager} from './chart_manager'
+import {ChartSettings} from './chart_settings'
+import {Template} from './templates'
 import '../css/main.css'
 import tpl from '../view/tpl.html'
 import fire from './firebase'
 import $ from 'jquery'
-
 
 export default class Kline {
 
@@ -48,7 +37,16 @@ export default class Kline {
         this.debug = true;
         this.language = "zh-cn";
         this.theme = "dark";
-        this.ranges = ["1w", "1d", "1h", "30m", "15m", "5m", "1m", "line"];
+        this.ranges = [
+            "1w",
+            "1d",
+            "1h",
+            "30m",
+            "15m",
+            "5m",
+            "1m",
+            "line"
+        ];
         this.showTrade = true;
         this.tradeWidth = 250;
         this.socketConnected = false;
@@ -58,9 +56,6 @@ export default class Kline {
         this.paused = false;
         this.subscribed = null;
         this.disableFirebase = false;
-        //新增请求参数
-        this.exchange = "OKEX";
-        this.quote = "USTD";
         this.periodMap = {
             "01w": 7 * 86400 * 1000,
             "03d": 3 * 86400 * 1000,
@@ -104,7 +99,6 @@ export default class Kline {
         return Kline.instance;
     }
 
-
     /*********************************************
      * Methods
      *********************************************/
@@ -132,8 +126,12 @@ export default class Kline {
         }
 
         this.registerMouseEvent();
-        ChartManager.instance.bindCanvas("main", document.getElementById("chart_mainCanvas"));
-        ChartManager.instance.bindCanvas("overlay", document.getElementById("chart_overlayCanvas"));
+        ChartManager
+            .instance
+            .bindCanvas("main", document.getElementById("chart_mainCanvas"));
+        ChartManager
+            .instance
+            .bindCanvas("overlay", document.getElementById("chart_overlayCanvas"));
         Control.refreshTemplate();
         Control.onSize(this.width, this.height);
         Control.readCookie();
@@ -141,9 +139,7 @@ export default class Kline {
         this.setTheme(this.theme);
         this.setLanguage(this.language);
 
-        $(this.element).css({
-            visibility: "visible"
-        });
+        $(this.element).css({visibility: "visible"});
     }
 
     resize(width, height) {
@@ -242,14 +238,15 @@ export default class Kline {
             return;
         }
         if (this.stompClient) {
-            this.stompClient.disconnect();
+            this
+                .stompClient
+                .disconnect();
             this.socketConnected = false;
         }
         if (this.debug) {
             console.log('DEBUG: socket disconnected');
         }
     }
-
 
     /*********************************************
      * Events
@@ -286,31 +283,36 @@ export default class Kline {
     }
 
     registerMouseEvent() {
-        $(document).ready(function () {
-            function __resize() {
-                if (navigator.userAgent.indexOf('Firefox') >= 0) {
-                    setTimeout(function () {
+        $(document)
+            .ready(function () {
+                function __resize() {
+                    if (navigator.userAgent.indexOf('Firefox') >= 0) {
+                        setTimeout(function () {
+                            Control.onSize(this.width, this.height)
+                        }, 200);
+                    } else {
                         Control.onSize(this.width, this.height)
-                    }, 200);
-                } else {
-                    Control.onSize(this.width, this.height)
+                    }
                 }
-            }
 
-            $('#chart_overlayCanvas').bind("contextmenu", function (e) {
-                e.cancelBubble = true;
-                e.returnValue = false;
-                e.preventDefault();
-                e.stopPropagation();
-                return false;
-            });
-            $(".chart_container .chart_dropdown .chart_dropdown_t")
-                .mouseover(function () {
+                $('#chart_overlayCanvas')
+                    .bind("contextmenu", function (e) {
+                        e.cancelBubble = true;
+                        e.returnValue = false;
+                        e.preventDefault();
+                        e.stopPropagation();
+                        return false;
+                    });
+                $(".chart_container .chart_dropdown .chart_dropdown_t").mouseover(function () {
                     let container = $(".chart_container");
                     let title = $(this);
                     let dropdown = title.next();
-                    let containerLeft = container.offset().left;
-                    let titleLeft = title.offset().left;
+                    let containerLeft = container
+                        .offset()
+                        .left;
+                    let titleLeft = title
+                        .offset()
+                        .left;
                     let containerWidth = container.width();
                     let titleWidth = title.width();
                     let dropdownWidth = dropdown.width();
@@ -328,92 +330,104 @@ export default class Kline {
                     title.addClass("chart_dropdown-hover");
                     dropdown.addClass("chart_dropdown-hover");
                 })
-                .mouseout(function () {
-                    $(this).next().removeClass("chart_dropdown-hover");
-                    $(this).removeClass("chart_dropdown-hover");
-                });
-            $(".chart_dropdown_data")
-                .mouseover(function () {
-                    $(this).addClass("chart_dropdown-hover");
-                    $(this).prev().addClass("chart_dropdown-hover");
-                })
-                .mouseout(function () {
-                    $(this).prev().removeClass("chart_dropdown-hover");
-                    $(this).removeClass("chart_dropdown-hover");
-                });
-            $("#chart_btn_parameter_settings").click(function () {
-                $('#chart_parameter_settings').addClass("clicked");
-                $(".chart_dropdown_data").removeClass("chart_dropdown-hover");
-                $("#chart_parameter_settings").find("th").each(function () {
-                    let name = $(this).html();
-                    let index = 0;
-                    let tmp = ChartSettings.get();
-                    let value = tmp.indics[name];
-                    $(this.nextElementSibling).find("input").each(function () {
-                        if (value !== null && index < value.length) {
-                            $(this).val(value[index]);
-                        }
-                        index++;
+                    .mouseout(function () {
+                        $(this)
+                            .next()
+                            .removeClass("chart_dropdown-hover");
+                        $(this).removeClass("chart_dropdown-hover");
                     });
+                $(".chart_dropdown_data").mouseover(function () {
+                    $(this).addClass("chart_dropdown-hover");
+                    $(this)
+                        .prev()
+                        .addClass("chart_dropdown-hover");
+                })
+                    .mouseout(function () {
+                        $(this)
+                            .prev()
+                            .removeClass("chart_dropdown-hover");
+                        $(this).removeClass("chart_dropdown-hover");
+                    });
+                $("#chart_btn_parameter_settings").click(function () {
+                    $('#chart_parameter_settings').addClass("clicked");
+                    $(".chart_dropdown_data").removeClass("chart_dropdown-hover");
+                    $("#chart_parameter_settings")
+                        .find("th")
+                        .each(function () {
+                            let name = $(this).html();
+                            let index = 0;
+                            let tmp = ChartSettings.get();
+                            let value = tmp.indics[name];
+                            $(this.nextElementSibling)
+                                .find("input")
+                                .each(function () {
+                                    if (value !== null && index < value.length) {
+                                        $(this).val(value[index]);
+                                    }
+                                    index++;
+                                });
+                        });
                 });
-            });
-            $("#close_settings").click(function () {
-                $('#chart_parameter_settings').removeClass("clicked");
-            });
-            $(".chart_container .chart_toolbar_tabgroup a")
-                .click(function () {
+                $("#close_settings").click(function () {
+                    $('#chart_parameter_settings').removeClass("clicked");
+                });
+                $(".chart_container .chart_toolbar_tabgroup a").click(function () {
                     Control.switchPeriod($(this).parent().attr('name'));
 
                 });
-            $("#chart_toolbar_periods_vert ul a").click(function () {
+                $("#chart_toolbar_periods_vert ul a").click(function () {
 
-                Control.switchPeriod($(this).parent().attr('name'));
+                    Control.switchPeriod($(this).parent().attr('name'));
 
-            });
+                });
 
-            $(".market_chooser ul a").click(function () {
-                Control.switchSymbol($(this).attr('name'));
-            });
+                $(".market_chooser ul a").click(function () {
+                    Control.switchSymbol($(this).attr('name'));
+                });
 
-            $('#chart_show_tools')
-                .click(function () {
+                $('#chart_show_tools').click(function () {
                     if ($(this).hasClass('selected')) {
                         Control.switchTools('off');
                     } else {
                         Control.switchTools('on');
                     }
                 });
-            $("#chart_toolpanel .chart_toolpanel_button")
-                .click(function () {
+                $("#chart_toolpanel .chart_toolpanel_button").click(function () {
                     $(".chart_dropdown_data").removeClass("chart_dropdown-hover");
                     $("#chart_toolpanel .chart_toolpanel_button").removeClass("selected");
                     $(this).addClass("selected");
-                    let name = $(this).children().attr('name');
-                    Kline.instance.chartMgr.setRunningMode(ChartManager.DrawingTool[name]);
+                    let name = $(this)
+                        .children()
+                        .attr('name');
+                    Kline
+                        .instance
+                        .chartMgr
+                        .setRunningMode(ChartManager.DrawingTool[name]);
                 });
-            $('#chart_show_indicator')
-                .click(function () {
+                $('#chart_show_indicator').click(function () {
                     if ($(this).hasClass('selected')) {
                         Control.switchIndic('off');
                     } else {
                         Control.switchIndic('on');
                     }
                 });
-            $("#chart_tabbar li a")
-                .click(function () {
+                $("#chart_tabbar li a").click(function () {
                     $("#chart_tabbar li a").removeClass('selected');
                     $(this).addClass('selected');
                     let name = $(this).attr('name');
                     let tmp = ChartSettings.get();
                     tmp.charts.indics[1] = name;
                     ChartSettings.save();
-                    if (Template.displayVolume === false)
+                    if (Template.displayVolume === false) 
                         ChartManager.instance.getChart().setIndicator(1, name);
-                    else
-                        ChartManager.instance.getChart().setIndicator(2, name);
-                });
-            $("#chart_select_chart_style a")
-                .click(function () {
+                    else 
+                        ChartManager
+                            .instance
+                            .getChart()
+                            .setIndicator(2, name);
+                    }
+                );
+                $("#chart_select_chart_style a").click(function () {
                     $("#chart_select_chart_style a").removeClass('selected');
                     $(this).addClass("selected");
                     let tmp = ChartSettings.get();
@@ -423,17 +437,16 @@ export default class Kline {
                     mgr.setChartStyle("frame0.k0", $(this).html());
                     mgr.redraw();
                 });
-            $('#chart_dropdown_themes li').click(function () {
-                $('#chart_dropdown_themes li a').removeClass('selected');
-                let name = $(this).attr('name');
-                if (name === 'chart_themes_dark') {
-                    Control.switchTheme('dark');
-                } else if (name === 'chart_themes_light') {
-                    Control.switchTheme('light');
-                }
-            });
-            $("#chart_select_main_indicator a")
-                .click(function () {
+                $('#chart_dropdown_themes li').click(function () {
+                    $('#chart_dropdown_themes li a').removeClass('selected');
+                    let name = $(this).attr('name');
+                    if (name === 'chart_themes_dark') {
+                        Control.switchTheme('dark');
+                    } else if (name === 'chart_themes_light') {
+                        Control.switchTheme('light');
+                    }
+                });
+                $("#chart_select_main_indicator a").click(function () {
                     $("#chart_select_main_indicator a").removeClass('selected');
                     $(this).addClass("selected");
                     let name = $(this).attr('name');
@@ -441,71 +454,80 @@ export default class Kline {
                     tmp.charts.mIndic = name;
                     ChartSettings.save();
                     let mgr = ChartManager.instance;
-                    if (!mgr.setMainIndicator("frame0.k0", name))
+                    if (!mgr.setMainIndicator("frame0.k0", name)) 
                         mgr.removeMainIndicator("frame0.k0");
                     mgr.redraw();
                 });
-            $('#chart_toolbar_theme a').click(function () {
-                $('#chart_toolbar_theme a').removeClass('selected');
-                if ($(this).attr('name') === 'dark') {
-                    Control.switchTheme('dark');
-                } else if ($(this).attr('name') === 'light') {
-                    Control.switchTheme('light');
-                }
-            });
-            $('#chart_select_theme li a').click(function () {
-                $('#chart_select_theme a').removeClass('selected');
-                if ($(this).attr('name') === 'dark') {
-                    Control.switchTheme('dark');
-                } else if ($(this).attr('name') === 'light') {
-                    Control.switchTheme('light');
-                }
-            });
-            $('#chart_enable_tools li a').click(function () {
-                $('#chart_enable_tools a').removeClass('selected');
-                if ($(this).attr('name') === 'on') {
-                    Control.switchTools('on');
-                } else if ($(this).attr('name') === 'off') {
-                    Control.switchTools('off');
-                }
-            });
-            $('#chart_enable_indicator li a').click(function () {
-                $('#chart_enable_indicator a').removeClass('selected');
-                if ($(this).attr('name') === 'on') {
-                    Control.switchIndic('on');
-                } else if ($(this).attr('name') === 'off') {
-                    Control.switchIndic('off');
-                }
-            });
-            $('#chart_language_setting_div li a').click(function () {
+                $('#chart_toolbar_theme a').click(function () {
+                    $('#chart_toolbar_theme a').removeClass('selected');
+                    if ($(this).attr('name') === 'dark') {
+                        Control.switchTheme('dark');
+                    } else if ($(this).attr('name') === 'light') {
+                        Control.switchTheme('light');
+                    }
+                });
+                $('#chart_select_theme li a').click(function () {
+                    $('#chart_select_theme a').removeClass('selected');
+                    if ($(this).attr('name') === 'dark') {
+                        Control.switchTheme('dark');
+                    } else if ($(this).attr('name') === 'light') {
+                        Control.switchTheme('light');
+                    }
+                });
+                $('#chart_enable_tools li a').click(function () {
+                    $('#chart_enable_tools a').removeClass('selected');
+                    if ($(this).attr('name') === 'on') {
+                        Control.switchTools('on');
+                    } else if ($(this).attr('name') === 'off') {
+                        Control.switchTools('off');
+                    }
+                });
+                $('#chart_enable_indicator li a').click(function () {
+                    $('#chart_enable_indicator a').removeClass('selected');
+                    if ($(this).attr('name') === 'on') {
+                        Control.switchIndic('on');
+                    } else if ($(this).attr('name') === 'off') {
+                        Control.switchIndic('off');
+                    }
+                });
+                $('#chart_language_setting_div li a').click(function () {
 
-                $('#chart_language_setting_div a').removeClass('selected');
-                if ($(this).attr('name') === 'zh-cn') {
-                    Control.chartSwitchLanguage('zh-cn');
-                } else if ($(this).attr('name') === 'en-us') {
+                    $('#chart_language_setting_div a').removeClass('selected');
+                    if ($(this).attr('name') === 'zh-cn') {
+                        Control.chartSwitchLanguage('zh-cn');
+                    } else if ($(this).attr('name') === 'en-us') {
 
-                    Control.chartSwitchLanguage('en-us');
-                } else if ($(this).attr('name') === 'zh-tw') {
-                    Control.chartSwitchLanguage('zh-tw');
-                }
-            });
-            $(document).keyup(function (e) {
-                if (e.keyCode === 46) {
-                    ChartManager.instance.deleteToolObject();
-                    ChartManager.instance.redraw('OverlayCanvas', false);
-                }
-            });
-            $("#clearCanvas").click(function () {
-                let pDPTool = ChartManager.instance.getDataSource("frame0.k0");
-                let len = pDPTool.getToolObjectCount();
-                for (let i = 0; i < len; i++) {
-                    pDPTool.delToolObject();
-                }
-                ChartManager.instance.redraw('OverlayCanvas', false);
-            });
-            $("#chart_overlayCanvas")
-                .mousemove(function (e) {
-                    let r = e.target.getBoundingClientRect();
+                        Control.chartSwitchLanguage('en-us');
+                    } else if ($(this).attr('name') === 'zh-tw') {
+                        Control.chartSwitchLanguage('zh-tw');
+                    }
+                });
+                $(document).keyup(function (e) {
+                    if (e.keyCode === 46) {
+                        ChartManager
+                            .instance
+                            .deleteToolObject();
+                        ChartManager
+                            .instance
+                            .redraw('OverlayCanvas', false);
+                    }
+                });
+                $("#clearCanvas").click(function () {
+                    let pDPTool = ChartManager
+                        .instance
+                        .getDataSource("frame0.k0");
+                    let len = pDPTool.getToolObjectCount();
+                    for (let i = 0; i < len; i++) {
+                        pDPTool.delToolObject();
+                    }
+                    ChartManager
+                        .instance
+                        .redraw('OverlayCanvas', false);
+                });
+                $("#chart_overlayCanvas").mousemove(function (e) {
+                    let r = e
+                        .target
+                        .getBoundingClientRect();
                     let x = e.clientX - r.left;
                     let y = e.clientY - r.top;
                     let mgr = ChartManager.instance;
@@ -515,128 +537,148 @@ export default class Kline {
                     } else {
                         mgr.onMouseMove("frame0", x, y, false);
                         mgr.redraw("OverlayCanvas");
-                    }
-                })
-                .mouseleave(function (e) {
-                    let r = e.target.getBoundingClientRect();
-                    let x = e.clientX - r.left;
-                    let y = e.clientY - r.top;
-                    let mgr = ChartManager.instance;
-                    mgr.onMouseLeave("frame0", x, y, false);
-                    mgr.redraw("OverlayCanvas");
-                })
-                .mouseup(function (e) {
-                    if (e.which !== 1) {
-                        return;
-                    }
-                    Kline.instance.buttonDown = false;
-                    let r = e.target.getBoundingClientRect();
-                    let x = e.clientX - r.left;
-                    let y = e.clientY - r.top;
-                    let mgr = ChartManager.instance;
-                    mgr.onMouseUp("frame0", x, y);
-                    mgr.redraw("All");
-                })
-                .mousedown(function (e) {
-                    if (e.which !== 1) {
-                        ChartManager.instance.deleteToolObject();
-                        ChartManager.instance.redraw('OverlayCanvas', false);
-                        return;
-                    }
-                    Kline.instance.buttonDown = true;
-                    let r = e.target.getBoundingClientRect();
-                    let x = e.clientX - r.left;
-                    let y = e.clientY - r.top;
-                    ChartManager.instance.onMouseDown("frame0", x, y);
-                });
-            $("#chart_parameter_settings :input").change(function () {
-                let name = $(this).attr("name");
-                let index = 0;
-                let valueArray = [];
-                let mgr = ChartManager.instance;
-                $("#chart_parameter_settings :input").each(function () {
-                    if ($(this).attr("name") === name) {
-                        if ($(this).val() !== "" && $(this).val() !== null && $(this).val() !== undefined) {
-                            let i = parseInt($(this).val());
-                            valueArray.push(i);
                         }
-                        index++;
-                    }
-                });
-                if (valueArray.length !== 0) {
-                    mgr.setIndicatorParameters(name, valueArray);
-                    let value = mgr.getIndicatorParameters(name);
-                    let cookieArray = [];
-                    index = 0;
+                    })
+                    .mouseleave(function (e) {
+                        let r = e
+                            .target
+                            .getBoundingClientRect();
+                        let x = e.clientX - r.left;
+                        let y = e.clientY - r.top;
+                        let mgr = ChartManager.instance;
+                        mgr.onMouseLeave("frame0", x, y, false);
+                        mgr.redraw("OverlayCanvas");
+                    })
+                    .mouseup(function (e) {
+                        if (e.which !== 1) {
+                            return;
+                        }
+                        Kline.instance.buttonDown = false;
+                        let r = e
+                            .target
+                            .getBoundingClientRect();
+                        let x = e.clientX - r.left;
+                        let y = e.clientY - r.top;
+                        let mgr = ChartManager.instance;
+                        mgr.onMouseUp("frame0", x, y);
+                        mgr.redraw("All");
+                    })
+                    .mousedown(function (e) {
+                        if (e.which !== 1) {
+                            ChartManager
+                                .instance
+                                .deleteToolObject();
+                            ChartManager
+                                .instance
+                                .redraw('OverlayCanvas', false);
+                            return;
+                        }
+                        Kline.instance.buttonDown = true;
+                        let r = e
+                            .target
+                            .getBoundingClientRect();
+                        let x = e.clientX - r.left;
+                        let y = e.clientY - r.top;
+                        ChartManager
+                            .instance
+                            .onMouseDown("frame0", x, y);
+                    });
+                $("#chart_parameter_settings :input").change(function () {
+                    let name = $(this).attr("name");
+                    let index = 0;
+                    let valueArray = [];
+                    let mgr = ChartManager.instance;
                     $("#chart_parameter_settings :input").each(function () {
                         if ($(this).attr("name") === name) {
                             if ($(this).val() !== "" && $(this).val() !== null && $(this).val() !== undefined) {
-                                $(this).val(value[index].getValue());
-                                cookieArray.push(value[index].getValue());
+                                let i = parseInt($(this).val());
+                                valueArray.push(i);
                             }
                             index++;
                         }
                     });
-                    let tmp = ChartSettings.get();
-                    tmp.indics[name] = cookieArray;
-                    ChartSettings.save();
-                    mgr.redraw('All', false);
-                }
-            });
-            $("#chart_parameter_settings button").click(function () {
-                let name = $(this).parents("tr").children("th").html();
-                let index = 0;
-                let value = ChartManager.instance.getIndicatorParameters(name);
-                let valueArray = [];
-                $(this).parent().prev().children('input').each(function () {
-                    if (value !== null && index < value.length) {
-                        $(this).val(value[index].getDefaultValue());
-                        valueArray.push(value[index].getDefaultValue());
+                    if (valueArray.length !== 0) {
+                        mgr.setIndicatorParameters(name, valueArray);
+                        let value = mgr.getIndicatorParameters(name);
+                        let cookieArray = [];
+                        index = 0;
+                        $("#chart_parameter_settings :input").each(function () {
+                            if ($(this).attr("name") === name) {
+                                if ($(this).val() !== "" && $(this).val() !== null && $(this).val() !== undefined) {
+                                    $(this).val(value[index].getValue());
+                                    cookieArray.push(value[index].getValue());
+                                }
+                                index++;
+                            }
+                        });
+                        let tmp = ChartSettings.get();
+                        tmp.indics[name] = cookieArray;
+                        ChartSettings.save();
+                        mgr.redraw('All', false);
                     }
-                    index++;
                 });
-                ChartManager.instance.setIndicatorParameters(name, valueArray);
-                let tmp = ChartSettings.get();
-                tmp.indics[name] = valueArray;
-                ChartSettings.save();
-                ChartManager.instance.redraw('All', false);
-            });
+                $("#chart_parameter_settings button").click(function () {
+                    let name = $(this)
+                        .parents("tr")
+                        .children("th")
+                        .html();
+                    let index = 0;
+                    let value = ChartManager
+                        .instance
+                        .getIndicatorParameters(name);
+                    let valueArray = [];
+                    $(this)
+                        .parent()
+                        .prev()
+                        .children('input')
+                        .each(function () {
+                            if (value !== null && index < value.length) {
+                                $(this).val(value[index].getDefaultValue());
+                                valueArray.push(value[index].getDefaultValue());
+                            }
+                            index++;
+                        });
+                    ChartManager
+                        .instance
+                        .setIndicatorParameters(name, valueArray);
+                    let tmp = ChartSettings.get();
+                    tmp.indics[name] = valueArray;
+                    ChartSettings.save();
+                    ChartManager
+                        .instance
+                        .redraw('All', false);
+                });
 
+                $('body').on('click', '#sizeIcon', function () {
+                    Kline.instance.isSized = !Kline.instance.isSized;
+                    if (Kline.instance.isSized) {
+                        $(Kline.instance.element).css({
+                            position: 'fixed',
+                            left: '0',
+                            right: '0',
+                            top: '0',
+                            bottom: '0',
+                            width: '100%',
+                            height: '100%',
+                            zIndex: '10000'
+                        });
 
-            $('body').on('click', '#sizeIcon', function () {
-                Kline.instance.isSized = !Kline.instance.isSized;
-                if (Kline.instance.isSized) {
-                    $(Kline.instance.element).css({
-                        position: 'fixed',
-                        left: '0',
-                        right: '0',
-                        top: '0',
-                        bottom: '0',
-                        width: '100%',
-                        height: '100%',
-                        zIndex: '10000'
-                    });
+                        Control.onSize();
+                        $('html,body').css({width: '100%', height: '100%', overflow: 'hidden'});
+                    } else {
+                        $(Kline.instance.element).attr('style', '');
 
-                    Control.onSize();
-                    $('html,body').css({
-                        width: '100%',
-                        height: '100%',
-                        overflow: 'hidden'
-                    });
-                } else {
-                    $(Kline.instance.element).attr('style', '');
+                        $('html,body').attr('style', '');
 
-                    $('html,body').attr('style', '');
+                        Control.onSize(Kline.instance.width, Kline.instance.height);
+                        $(Kline.instance.element).css({
+                            visibility: 'visible',
+                            height: Kline.instance.height + 'px'
+                        });
+                    }
+                });
 
-                    Control.onSize(Kline.instance.width, Kline.instance.height);
-                    $(Kline.instance.element).css({
-                        visibility: 'visible',
-                        height: Kline.instance.height + 'px'
-                    });
-                }
-            });
-
-        })
+            })
 
     }
 

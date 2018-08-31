@@ -74,10 +74,7 @@ export class Chart {
             bids_si: 0,
             bids_ei: 0
         };
-        // 设置请求参数
-        this.strIsLine = false;
-        this._range = Kline.instance.range;
-        this._symbol = Kline.instance.symbol;
+
     }
 
     setTitle() {
